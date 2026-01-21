@@ -1,0 +1,42 @@
+version: "3"
+
+networks:
+  pihole_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"
+    networks:
+      pihole_network:
+        ipv4_address: 172.20.0.5
+    environment:
+      TZ: 'Europe/Prague'
+      WEBPASSWORD: 'changeme123'  # CHANGE THIS!
+      PIHOLE_DNS_: '172.20.0.100'
+      DNS1: '172.20.0.100'
+      DNS2: 'no'
+    volumes:
+      - './pihole/pihole:/etc/pihole'
+      - './pihole/dnsmasq.d:/etc/dnsmasq.d'
+    restart: unless-stopped
+    depends_on:
+      - unbound
+
+  unbound:
+    container_name: unbound
+    image: mvance/unbound-rpi:latest
+    networks:
+      pihole_network:
+        ipv4_address: 172.20.0.100
+    volumes:
+      - './unbound:/opt/unbound/etc/unbound/'
+    restart: unless-stopped
