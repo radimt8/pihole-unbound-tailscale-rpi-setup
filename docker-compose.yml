@@ -23,7 +23,7 @@ services:
       WEBPASSWORD: ${WEBPASSWORD}
       PIHOLE_DNS_: '172.23.0.8#53'
       DNSMASQ_LISTENING: all
-      FTLCONFIG_webserver_api_password: ${FTLCONFIG_webserver_api_password}
+      FTLCONF_webserver_api_password: ${FTLCONF_webserver_api_password}
     volumes:
       - pihole_data:/etc/pihole/
       - pihole_dnsmasq:/etc/dnsmasq.d/
