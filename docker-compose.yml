@@ -31,7 +31,7 @@ services:
 
   unbound:
     container_name: unbound
-    image: mvance/unbound:latest
+    image: mvance/unbound-rpi:latest
     networks:
       pihole_network:
         ipv4_address: 172.20.0.100
