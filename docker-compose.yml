@@ -3,7 +3,7 @@ services:
     image: mvance/unbound-rpi:latest
     container_name: unbound
     volumes:
-      - ./unbound_config/unbound.conf:/opt/unbound/etc/unbound/unbound.conf:ro
+      - ./unbound_config/:/opt/unbound/etc/unbound/
       - unbound_data:/opt/unbound/etc/unbound
     restart: unless-stopped
     networks:
@@ -26,8 +26,7 @@ services:
       - pihole_config:/etc/pihole
       - pihole_dnsmasq:/etc/dnsmasq.d
     depends_on:
-      unbound:
-        condition: service_healthy
+      - unbound
     restart: unless-stopped
     networks:
       - pihole_network
