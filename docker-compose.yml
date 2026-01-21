@@ -2,11 +2,16 @@ services:
   unbound:
     image: mvance/unbound-rpi:latest
     container_name: unbound
+    ports:
+      - "5053:53/tcp"
+      - "5053:53/udp"
     volumes:
       - ./unbound_config/:/opt/unbound/etc/unbound/
+      - /dev:/opt/unbound/etc/unbound/dev
     restart: unless-stopped
     networks:
-      - pihole_network
+      dns_net:
+        ipv4_address: 172.23.0.8
 
   pihole:
     image: pihole/pihole:latest
@@ -15,7 +20,6 @@ services:
       - "53:53/tcp"
       - "53:53/udp"
       - "80:80/tcp"
-      - "443:443/tcp"
     environment:
       TZ: Europe/Prague
       FTLCONF_dns_upstreams: unbound
@@ -28,7 +32,9 @@ services:
       - unbound
     restart: unless-stopped
     networks:
-      - pihole_network
+      dns_net:
+        ipv4_address: 172.23.0.7
+
 
 volumes:
   unbound_data:
@@ -36,5 +42,8 @@ volumes:
   pihole_dnsmasq:
 
 networks:
-  pihole_network:
+  dns_net:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.23.0.0/16
