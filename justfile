@@ -25,31 +25,31 @@ start:
     @echo "Starting Tailscale..."
     -sudo tailscale up --accept-dns=false
     @echo "Starting Pi-hole + Unbound..."
-    docker-compose up -d
+    docker compose up -d
     @echo "✅ All services running!"
 
 # Stop everything
 stop:
-    docker-compose down
+    docker compose down
     sudo tailscale down
     @echo "✅ All services stopped"
 
 # Restart Pi-hole
 restart:
-    docker-compose restart
+    docker compose restart
 
 # View logs
 logs service="":
     @if [ -z "{{service}}" ]; then \
-        docker-compose logs -f; \
+        docker compose logs -f; \
     else \
-        docker-compose logs -f {{service}}; \
+        docker compose logs -f {{service}}; \
     fi
 
 # Update containers
 update:
-    docker-compose pull
-    docker-compose up -d
+    docker compose pull
+    docker compose up -d
     @echo "✅ Containers updated!"
 
 # Show status
@@ -58,7 +58,7 @@ status:
     sudo tailscale status
     @echo ""
     @echo "=== Docker Status ==="
-    docker-compose ps
+    docker ps
     @echo ""
     @echo "=== Pi-hole Stats ==="
     curl -s http://localhost/admin/api.php\?summaryRaw | jq '.'
@@ -70,6 +70,6 @@ backup:
 
 # Clean up everything (dangerous!)
 clean:
-    docker-compose down -v
+    docker compose down -v
     sudo rm -rf pihole/ unbound/
     @echo "⚠️  All data deleted!"
