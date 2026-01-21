@@ -1,45 +1,4 @@
-services:
-  unbound:
-    image: mvance/unbound-rpi:latest
-    container_name: unbound
-    ports:
-      - "5053:53/tcp"
-      - "5053:53/udp"
-    volumes:
-      - ./unbound_config/:/opt/unbound/etc/unbound/
-      - /dev:/opt/unbound/etc/unbound/dev
-    restart: unless-stopped
-    networks:
-      dns_net:
-        ipv4_address: 172.23.0.8
-
-  pihole:
-    image: pihole/pihole:latest
-    container_name: pihole
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "80:80/tcp"
-    environment:
-      TZ: Europe/Prague
-      FTLCONF_dns_upstreams: unbound
-      FTLCONF_dns_listeningMode: ALL
-      FTLCONF_webserver_api_password: ${FTLCONF_webserver_api_password}
-    volumes:
-      - pihole_config:/etc/pihole
-      - pihole_dnsmasq:/etc/dnsmasq.d
-    depends_on:
-      - unbound
-    restart: unless-stopped
-    networks:
-      dns_net:
-        ipv4_address: 172.23.0.7
-
-
-volumes:
-  unbound_data:
-  pihole_config:
-  pihole_dnsmasq:
+version: '3.8'
 
 networks:
   dns_net:
@@ -47,3 +6,43 @@ networks:
     ipam:
       config:
         - subnet: 172.23.0.0/16
+
+services:
+  pihole:
+    container_name: pihole
+    hostname: pihole
+    image: pihole/pihole:latest
+    networks:
+      dns_net:
+        ipv4_address: 172.23.0.7
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80/tcp"
+    environment:
+      TZ: ${TZ}
+      WEBPASSWORD: ${WEBPASSWORD}
+      PIHOLE_DNS_: '172.23.0.8#5053'
+      DNSMASQ_LISTENING: all
+    volumes:
+      - pihole_data:/etc/pihole/
+      - pihole_dnsmasq:/etc/dnsmasq.d/
+    restart: unless-stopped
+
+  unbound:
+    container_name: unbound
+    image: mvance/unbound-rpi:latest
+    networks:
+      dns_net:
+        ipv4_address: 172.23.0.8
+    volumes:
+      - ./unbound:/opt/unbound/etc/unbound
+      - /dev:/opt/unbound/etc/unbound/dev
+    ports:
+      - "5053:53/tcp"
+      - "5053:53/udp"
+    restart: unless-stopped
+
+volumes:
+  pihole_data:
+  pihole_dnsmasq:
