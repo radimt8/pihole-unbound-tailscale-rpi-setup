@@ -14,11 +14,17 @@ setup: install-tailscale start
     @echo "Pi-hole admin: http://$(hostname -I | awk '{print $1}')/admin"
     @echo "Password: Check docker-compose.yml"
 
-# Install Tailscale
+# Install Tailscale (skip if already installed)
 install-tailscale:
-    curl -fsSL https://tailscale.com/install.sh | sh
-    @echo "Authenticating Tailscale (opens browser)..."
-    sudo tailscale up --accept-dns=false
+    #!/usr/bin/env bash
+    if command -v tailscale &> /dev/null; then
+        echo "✅ Tailscale already installed, skipping..."
+    else
+        echo "Installing Tailscale..."
+        curl -fsSL https://tailscale.com/install.sh | sh
+        echo "Authenticating Tailscale (opens browser)..."
+        sudo tailscale up --accept-dns=false
+    fi
 
 # Start everything
 start:
