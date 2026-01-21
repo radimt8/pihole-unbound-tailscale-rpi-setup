@@ -38,4 +38,5 @@ services:
         ipv4_address: 172.20.0.100
     volumes:
       - './unbound:/opt/unbound/etc/unbound/'
+    entrypoint: sh -c 'unbound-anchor -a /etc/unbound/root.key 2>/dev/null; sed -i "/^include:/d" /etc/unbound/unbound.conf; exec unbound -d'
     restart: unless-stopped
