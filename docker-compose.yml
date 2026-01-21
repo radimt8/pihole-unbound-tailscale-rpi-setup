@@ -1,5 +1,3 @@
-version: '3.8'
-
 networks:
   dns_net:
     driver: bridge
@@ -19,11 +17,13 @@ services:
       - "53:53/tcp"
       - "53:53/udp"
       - "80:80/tcp"
+      - "443:443/tcp"
     environment:
       TZ: ${TZ}
       WEBPASSWORD: ${WEBPASSWORD}
       PIHOLE_DNS_: '172.23.0.8#5053'
       DNSMASQ_LISTENING: all
+      FTLCONFIG_webserver_api_password: ${FTLCONFIG_webserver_api_password}
     volumes:
       - pihole_data:/etc/pihole/
       - pihole_dnsmasq:/etc/dnsmasq.d/
