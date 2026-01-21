@@ -18,16 +18,24 @@ services:
       - "53:53/udp"
       - "80:80/tcp"
       - "443:443/tcp"
+      # Uncomment if using Pi-hole as DHCP server
+      #- "67:67/udp"
     environment:
       TZ: ${TZ}
-      WEBPASSWORD: ${WEBPASSWORD}
-      DNSMASQ_LISTENING: all
       FTLCONF_webserver_api_password: ${FTLCONF_webserver_api_password}
       FTLCONF_dns_upstreams: 'unbound'
+      FTLCONF_dns_listeningMode: 'all'
     volumes:
       - pihole_data:/etc/pihole/
       - pihole_dnsmasq:/etc/dnsmasq.d/
+    cap_add:
+      # Uncomment if using DHCP
+      #- NET_ADMIN
+      # Optional for better priority
+      - SYS_NICE
     restart: unless-stopped
+    depends_on:
+      - unbound
 
   unbound:
     container_name: unbound
@@ -37,7 +45,6 @@ services:
         ipv4_address: 172.23.0.8
     volumes:
       - ./unbound:/opt/unbound/etc/unbound
-      - /dev:/opt/unbound/etc/unbound/dev
     restart: unless-stopped
 
 volumes:
